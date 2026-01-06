@@ -6,9 +6,13 @@ import numpy as np
 import glob
 import os
 
-M_C_13 = 12.89165 # а.е.м. масса атома углерода 13 
-M_He_4 = 3.968219 # а.е.м. масса атома гелия 4
-# M_He_4 = 4.002603 # а.е.м. масса ядра гелия 4
+# M_C_13 = 12.89165 # а.е.м. масса атома углерода 13 
+# M_He_4 = 3.968219 # а.е.м. масса атома гелия 4
+# # M_He_4 = 4.002603 # а.е.м. масса ядра гелия 4
+
+M_C_13 = 12.89165*931_493_614.8385  # эВ масса атома углерода 13 
+M_He_4 = 3.968219*931_493_614.8385  # эВ масса атома гелия 4
+# M_He_4 = 4.002603*931_493_614.8385  # эВ масса ядра гелия 4
 
 def data_preparator(directory_path):
     
@@ -94,11 +98,9 @@ def data_preparator(directory_path):
     fname = '6_Brandenburg_2023'
     
     df = pd.read_csv('./full_data_stage_1/' + fname + '.csv')
-
-    print("EN-CM (EV) 1.1", np.min(df['EN-CM (EV) 1.1'])/1e6, np.max(df['EN-CM (EV) 1.1'])/1e6)
-    # print(((M_C_13)/(M_C_13+M_He_4))**2)
-    df['Ea (eV)'] = df['EN-CM (EV) 1.1'] * ((M_C_13)/(M_C_13+M_He_4))  # CM to LAB
-    print("Ea    (eV)    ", np.min(df['Ea (eV)'])/1e6, np.max(df['Ea (eV)'])/1e6)
+    df['Ea (eV)'] = df['EN-CM (EV) 1.1'] * M_C_13/(M_C_13+M_He_4)
+    # df['Ea (eV)'] = df['EN-CM (EV) 1.1']**2. * (M_He_4/(M_C_13+M_He_4)**2.) + \
+    #     2.*df['EN-CM (EV) 1.1'] * (M_He_4/(M_C_13+M_He_4))    # CM to LAB
     
     df = df.rename(columns={
         'DATA (B) 0.1'              : 'XS (b)',
