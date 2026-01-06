@@ -79,11 +79,12 @@ def plot_all_dataframes(directory_path):
                 label = f"Dataset {i}"
             
             # Строим график
+            # df['XS (b)'] *= 100**i
             if label == "JENDL":
                 plt.plot(df['Ea (eV)'], df['XS (b)'], "-", 
                         color=colors[i], linewidth=5, label=label, alpha=0.5)
             elif label == "K. Brandenburg et.al.":
-                plt.plot(df['Ea (eV)']*1.3, df['XS (b)'], ".-", 
+                plt.plot(df['Ea (eV)'], df['XS (b)'], ".-", 
                         color=colors[i], linewidth=2, label= "K. Brandenburg et.al.", alpha=0.8)
             else:
                 plt.plot(df['Ea (eV)'], df['XS (b)'], ".-", 
@@ -133,17 +134,17 @@ def plot_2_dataframes(directory_path):
     # Находим все корректные CSV файлы в директории
     csv_files = [
         '1000_JENDL.csv',
-        '0_Drotleff_1993.csv', 
-        '1_Bair_1973.csv', 
-        '2_Kellogg_1989.csv', 
-        '3_Febbraro_2020.csv', 
-        '4_Walton_1957.csv', 
-        '5_Brandenburg_2023.csv', 
-        '6_Sekharan_1967.csv',
-        '7_Davids_1968.csv',
-        # '8_Harissopulos_2005_needs_correction.csv',
-        '9_Prusachenko_2022.csv',
-        '10_Gao_2022.csv',
+        '1_Drotleff_1993.csv', 
+        '2_Bair_1973.csv', 
+        '3_Kellogg_1989.csv', 
+        '4_Febbraro_2020.csv', 
+        '5_Walton_1957.csv', 
+        '6_Brandenburg_2023.csv', 
+        '7_Sekharan_1967.csv',
+        '8_Davids_1968.csv',
+        # '9_Harissopulos_2005_needs_correction.csv',
+        '10_Prusachenko_2022.csv',
+        '11_Gao_2022.csv',
         '100_Mohr.csv'
     ]
     

@@ -8,9 +8,7 @@ import os
 
 M_C_13 = 12.89165 # а.е.м. масса атома углерода 13 
 M_He_4 = 3.968219 # а.е.м. масса атома гелия 4
-print("Атом He4", ((M_C_13)/(M_C_13+M_He_4))**2)
 # M_He_4 = 4.002603 # а.е.м. масса ядра гелия 4
-# print("Ядро He4", ((M_C_13)/(M_C_13+M_He_4))**2)
 
 def data_preparator(directory_path):
     
@@ -47,7 +45,7 @@ def data_preparator(directory_path):
     # 'Note added in proof' of Phys.Rev.C7(1973)1356 is not
     # applied to the data set compiled in this EXFOR entry. 
     df = df[['XS (b)', 'dXS (b)', 'Ea (eV)', 'dEa (eV)']]
-    df.to_csv('./full_data_corrected/1_Bair_1973_corrected.csv', 
+    df.to_csv('./full_data_corrected/' + fname.strip("_needs_XSx0,8") + '_corrected.csv', 
               float_format='%.15e', index=False)
     
     # ================ #
@@ -96,6 +94,12 @@ def data_preparator(directory_path):
     fname = '6_Brandenburg_2023'
     
     df = pd.read_csv('./full_data_stage_1/' + fname + '.csv')
+
+    print("EN-CM (EV) 1.1", np.min(df['EN-CM (EV) 1.1'])/1e6, np.max(df['EN-CM (EV) 1.1'])/1e6)
+    # print(((M_C_13)/(M_C_13+M_He_4))**2)
+    df['Ea (eV)'] = df['EN-CM (EV) 1.1'] * ((M_C_13)/(M_C_13+M_He_4))  # CM to LAB
+    print("Ea    (eV)    ", np.min(df['Ea (eV)'])/1e6, np.max(df['Ea (eV)'])/1e6)
+    
     df = df.rename(columns={
         'DATA (B) 0.1'              : 'XS (b)',
         'ERR-S (B) 0.944'           : 'dXS st (b)', # Statistical uncertainty.
@@ -103,10 +107,9 @@ def data_preparator(directory_path):
         'ERR-2 (PER-CENT) 0.955'    : 'dXS 2 (%)',  # Target thickness.
         'ERR-3 (PER-CENT) 0.955'    : 'dXS 3 (%)',  # Integrated beam current.
         'ERR-SYS (PER-CENT) 0.955'  : 'dXS sy (%)', # Systematic uncertainty.
-        'EN-CM (EV) 1.1'            : 'Ea (eV)',
+        # 'EN-CM (EV) 1.1'            : 'Ea (eV)',
         'EN-RSL (PER-CENT) 1.922'   : 'dEa (%)'    # resolution
     })
-    df['Ea (eV)'] *= ((M_C_13)/(M_C_13+M_He_4))**2  # CM to LAB
 
     df['dEa (eV)'] = df['Ea (eV)'] * df['dEa (%)']/100. 
     df['dXS (b)'] = df['XS (b)'] * np.sqrt(
@@ -206,7 +209,9 @@ def data_preparator(directory_path):
         'EN (EV) 1.1'           : 'Ea (eV)'
     })
     df = df[['XS (b)', 'dXS (b)', 'Ea (eV)']] 
-    df.to_csv('./full_data_corrected/10_Gao_2022_corrected.csv', 
+    df.to_csv('./full_data_corrected/' + fname.strip("_inverse_n_alpha") + '_corrected.csv', 
+              float_format='%.15e', index=False)
+    df.to_csv('./full_data_corrected/11_Gao_2022_corrected.csv', 
               float_format='%.15e', index=False)
 
     # ================ #
