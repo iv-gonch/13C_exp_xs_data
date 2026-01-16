@@ -106,7 +106,7 @@ def plot_all_dataframes(directory_path):
         
     print (label)
     # Сохраняем график
-    output_file = os.path.join("all_dataframes/all_in_one_plot_log_comparison.png")
+    output_file = os.path.join("all_dataframes_plots/all_in_one_plot_log_comparison.png")
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
     print(f"\nГрафик сохранен в файл: {output_file}")
     plt.close()
@@ -114,6 +114,7 @@ def plot_all_dataframes(directory_path):
 
     # Создаем интерактивный график
     plt.figure(figsize=(16, 8))
+
     # Цвета для разных линий
     colors = plt.cm.tab20(np.linspace(0, 1, 13))
     # Обрабатываем каждый файл 
@@ -127,16 +128,28 @@ def plot_all_dataframes(directory_path):
                 label = original_files[i]
             else:
                 label = f"Dataset {i}"
+
+            # Необязательные погрешности
+            xerr = df['dEa (eV)'] if 'dEa (eV)' in df.columns else None
+            yerr = df['dXS (b)']  if 'dXS (b)'  in df.columns else None
+            
             # Строим график
             if label == "JENDL":
                 plt.plot(df['Ea (eV)'], df['XS (b)'], "-", 
-                        color=colors[i], linewidth=5, label=label, alpha=0.5)
-            elif label == "K. Brandenburg et.al.":
-                plt.plot(df['Ea (eV)'], df['XS (b)'], ".-", 
-                        color=colors[i], linewidth=2, label= "K. Brandenburg et.al.", alpha=0.8)
+                        color=colors[i], linewidth=5, label=label, alpha=0.3)
             else:
-                plt.plot(df['Ea (eV)'], df['XS (b)'], ".-", 
-                        color=colors[i], linewidth=2, label=label, alpha=0.8)
+                plt.errorbar(df['Ea (eV)'], df['XS (b)'], 
+                             xerr=xerr,
+                             yerr=yerr,
+                             fmt='.',
+                             capsize=3,
+                             elinewidth=1,
+                             markersize=4,
+                             color=colors[i], 
+                            #  linewidth=2, 
+                             label= label, 
+                             alpha=0.8
+                        )
 
             print(f"На график добавлен файл: {os.path.basename(csv_file)}")
             
@@ -148,7 +161,7 @@ def plot_all_dataframes(directory_path):
     plt.ylabel('Cross Section (b)', fontsize=14)
     plt.title('Cross Sections for All Datasets', fontsize=16)
     plt.legend(fontsize=12)
-    # Логарифмическая шкала по Y для лучшего отображения
+
     plt.xlim(0, 8e6)
     plt.tick_params(axis='both')
     plt.grid(visible=True, alpha=0.3, which='both', axis='both')
@@ -157,7 +170,7 @@ def plot_all_dataframes(directory_path):
 
     print (label)
     # Сохраняем график
-    output_file = os.path.join("all_dataframes/all_in_one_plot.png")
+    output_file = os.path.join("all_dataframes_plots/all_in_one_plot.png")
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
     print(f"\nГрафик сохранен в файл: {output_file}")
 
@@ -238,19 +251,19 @@ def plot_2_dataframes(directory_path):
 
             if label == "JENDL":
                 plt.plot(df['Ea (eV)'], df['XS (b)'], "-", 
-                        color=colors[i], linewidth=5, label=label, alpha=0.5)
+                        color=colors[i], linewidth=5, label=label, alpha=0.3)
                 JENDL_EN = df['Ea (eV)']
                 JENDL_XS = df['XS (b)']
             elif label == "P.S.Prusachenko et.al." or label == "M. Febbraro et.al.":
                 plt.plot(df['Ea (eV)'], df['XS (b)'], ".-", 
                         color=colors[i], linewidth=2, label=r"$(\alpha, n_0)$ " + label, alpha=1)
                 plt.plot(JENDL_EN, JENDL_XS, "-", 
-                        color=colors[0], linewidth=5, label="JENDL", alpha=0.5)
+                        color=colors[0], linewidth=5, label="JENDL", alpha=0.3)
             else:
                 plt.plot(df['Ea (eV)'], df['XS (b)'], ".-", 
                         color=colors[i], linewidth=2, label=label, alpha=1)
                 plt.plot(JENDL_EN, JENDL_XS, "-", 
-                        color=colors[0], linewidth=5, label="JENDL", alpha=0.5)
+                        color=colors[0], linewidth=5, label="JENDL", alpha=0.3)
             
             print(f"На график добавлен файл: {os.path.basename(csv_file)}")
             
@@ -275,7 +288,7 @@ def plot_2_dataframes(directory_path):
         
         print (label)
         # Сохраняем график
-        output_file = os.path.join("all_dataframes/" + label + "_plot.png")
+        output_file = os.path.join("all_dataframes_plots/" + label + "_plot.png")
         plt.savefig(output_file, dpi=300, bbox_inches='tight')
         print(f"\nГрафик сохранен в файл: {output_file}")
             
