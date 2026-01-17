@@ -8,14 +8,65 @@ import glob
 import os
 
 directory_path = "./histo_data/"
-name = './histo_plot/!combined_histogram_dXS_errs_no_a_n0' 
 
+# name = './histo_plot/!combined_histogram_all_errs_no_a_n0' 
+# title = "Гистограмма построена только" + \
+#  "\n" + "с использованием данных с ошибками" + \
+#  "\n" + "по XS и E_a," + \
+#  "\n" + r"исключая $(\alpha, n_0)$-реакции"
+# csv_file_names = ['7_Sekharan_1967', '2_Bair_1973', '6_Brandenburg_2023']
+
+# name = './histo_plot/!combined_histogram_all_errs' 
+# title = "Гистограмма построена только" + \
+#  "\n" + "с использованием данных с ошибками" + \
+#  "\n" + "по XS и E_a," + \
+#  "\n" + r"включая $(\alpha, n_0)$-реакции"
+# csv_file_names = ['10_Prusachenko_2022', '7_Sekharan_1967', '2_Bair_1973', '6_Brandenburg_2023']
+
+# name = './histo_plot/!combined_histogram_all' 
+# title = "Гистограмма построена" + \
+#  "\n" + "с использованием всех данных" 
+# csv_file_names = [
+#     '1000_JENDL',           # 'XS (b)',            'Ea (eV)'
+#     '100_Mohr',             # 'XS (b)',            'Ea (eV)'
+#     '5_Walton_1957',        # 'XS (b)',            'Ea (eV)'
+
+#     '1_Drotleff_1993',      # 'XS (b)', 'dXS (b)', 'Ea (eV)'
+#     '3_Kellogg_1989',       # 'XS (b)', 'dXS (b)', 'Ea (eV)'
+#     '8_Davids_1968',        # 'XS (b)', 'dXS (b)', 'Ea (eV)'
+#     '11_Gao_2022',          # 'XS (b)', 'dXS (b)', 'Ea (eV)'
+#     '4_Febbraro_2020',      # 'XS (b)', 'dXS (b)', 'Ea (eV)'    # (a, n0)
+
+#     '10_Prusachenko_2022',  # 'XS (b)', 'dXS (b)', 'Ea (eV)', 'dEa (eV)'    # (a, n0)
+#     '7_Sekharan_1967',      # 'XS (b)', 'dXS (b)', 'Ea (eV)', 'dEa (eV)'
+#     '2_Bair_1973',          # 'XS (b)', 'dXS (b)', 'Ea (eV)', 'dEa (eV)'
+#     '6_Brandenburg_2023'    # 'XS (b)', 'dXS (b)', 'Ea (eV)', 'dEa (eV)'
+# ]
+
+# name = './histo_plot/!combined_histogram_dXS_errs_no_a_n0' 
+# title = "Гистограмма построена только" + \
+#  "\n" + "с использованием данных с ошибками по XS," + \
+#  "\n" + r"исключая $(\alpha, n_0)$-реакции"
+# csv_file_names = [
+#     '1_Drotleff_1993',      # 'XS (b)', 'dXS (b)', 'Ea (eV)'
+#     '3_Kellogg_1989',       # 'XS (b)', 'dXS (b)', 'Ea (eV)'
+#     '8_Davids_1968',        # 'XS (b)', 'dXS (b)', 'Ea (eV)'
+#     '11_Gao_2022',          # 'XS (b)', 'dXS (b)', 'Ea (eV)'
+
+#     '7_Sekharan_1967',      # 'XS (b)', 'dXS (b)', 'Ea (eV)', 'dEa (eV)'
+#     '2_Bair_1973',          # 'XS (b)', 'dXS (b)', 'Ea (eV)', 'dEa (eV)'
+#     '6_Brandenburg_2023'    # 'XS (b)', 'dXS (b)', 'Ea (eV)', 'dEa (eV)'
+# ]
+
+name = './histo_plot/!combined_histogram_no_a_no' 
+title = "Гистограмма построена" + \
+ "\n" + "с использованием всех данных," + \
+ "\n" + r"исключая $(\alpha, n_0)$-реакции"
 csv_file_names = [
-    # '1000_JENDL',           # 'XS (b)',            'Ea (eV)'
-    # '100_Mohr',             # 'XS (b)',            'Ea (eV)'
-    # '5_Walton_1957',        # 'XS (b)',            'Ea (eV)'
+    '1000_JENDL',           # 'XS (b)',            'Ea (eV)'
+    '100_Mohr',             # 'XS (b)',            'Ea (eV)'
+    '5_Walton_1957',        # 'XS (b)',            'Ea (eV)'
 
-    # '4_Febbraro_2020',      # 'XS (b)', 'dXS (b)', 'Ea (eV)'    # (a, n0)
     '1_Drotleff_1993',      # 'XS (b)', 'dXS (b)', 'Ea (eV)'
     '3_Kellogg_1989',       # 'XS (b)', 'dXS (b)', 'Ea (eV)'
     '8_Davids_1968',        # 'XS (b)', 'dXS (b)', 'Ea (eV)'
@@ -23,30 +74,9 @@ csv_file_names = [
 
     '7_Sekharan_1967',      # 'XS (b)', 'dXS (b)', 'Ea (eV)', 'dEa (eV)'
     '2_Bair_1973',          # 'XS (b)', 'dXS (b)', 'Ea (eV)', 'dEa (eV)'
-    # '10_Prusachenko_2022',  # 'XS (b)', 'dXS (b)', 'Ea (eV)', 'dEa (eV)'    # (a, n0)
     '6_Brandenburg_2023'    # 'XS (b)', 'dXS (b)', 'Ea (eV)', 'dEa (eV)'
 ]
 
-csv_file_names_no_all_err = [
-    '1000_JENDL',
-    '100_Mohr',  
-    '5_Walton_1957'
-]
-
-csv_file_names_no_E_err = [
-    '4_Febbraro_2020',
-    '1_Drotleff_1993',
-    '3_Kellogg_1989',
-    '8_Davids_1968',
-    '11_Gao_2022'
-]
-
-csv_file_names_all_err = [
-    '7_Sekharan_1967',
-    '2_Bair_1973',
-    '10_Prusachenko_2022',
-    '6_Brandenburg_2023'
-]
 
 # Создаём словарь датафреймов (ключ — имя файла)
 dfs = {}
@@ -100,8 +130,8 @@ combined_df = pd.DataFrame({
 # Сохраняем в файл
 combined_df.to_csv(name + '.csv', index=False)
 
-print("Объединённая гистограмма сохранена в 'combined_histogram.csv'")
-print(combined_df.head())  # Для проверки
+# print("Объединённая гистограмма сохранена в 'combined_histogram.csv'")
+# print(combined_df.head())  # Для проверки
 
 y           = combined_df['sigma'     ]
 err_y       = combined_df['d_sigma'   ]
@@ -120,15 +150,11 @@ plt.xlabel('E (eV)')
 plt.ylabel('sigma * ΔE') 
 plt.title(f'Ступенчатый график с fractional binning ΔE = {delta_E_desired/1e3} keV') 
 plt.legend(
-    title="Гистограмма построена только\n" 
-            "с использованием данных с ошибками"
-        #   r"включая $(\alpha, n_0)$-реакции"
-        #   "единицы измерения,\n"
-        #   "важные допущения" 
+    title = title
 ) 
 plt.grid(True)
 
 plt.savefig(name +'.png') 
 fig = plt.gcf()   # get current figure
 mpld3.save_html(fig, name + ".html")
-plt.show()
+# plt.show()
