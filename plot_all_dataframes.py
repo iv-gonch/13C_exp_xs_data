@@ -51,7 +51,7 @@ def plot_all_dataframes(directory_path):
         # "S.Harissopulos et.al.", # нет поправки Питера Мора, исключаю из рассмотрения
         "B.Gao et.al."
     ]
-    
+
     # Сортируем файлы по номеру
     # csv_files.sort(key=lambda x: int(os.path.basename(x).split('_')[1].split('.')[0]))
     
@@ -107,13 +107,13 @@ def plot_all_dataframes(directory_path):
     print (label)
     # Сохраняем график
     output_file = os.path.join("all_dataframes_plots/all_in_one_plot_log_comparison.png")
-    plt.savefig(output_file, dpi=300, bbox_inches='tight')
+    plt.savefig(output_file, dpi=1000, bbox_inches='tight')
     print(f"\nГрафик сохранен в файл: {output_file}")
     plt.close()
 
 
     # Создаем интерактивный график
-    plt.figure(figsize=(16, 8))
+    plt.figure(figsize=(10*0.75, 6*0.75))
 
     # Цвета для разных линий
     colors = plt.cm.tab20(np.linspace(0, 1, 13))
@@ -136,7 +136,7 @@ def plot_all_dataframes(directory_path):
             # Строим график
             if label == "JENDL":
                 plt.plot(df['Ea (eV)'], df['XS (b)'], "-", 
-                        color=colors[i], linewidth=5, label=label, alpha=0.3)
+                        color="black", linewidth=5, label=label, alpha=0.3)
             else:
                 plt.errorbar(df['Ea (eV)'], df['XS (b)'], 
                              xerr=xerr,
@@ -161,7 +161,7 @@ def plot_all_dataframes(directory_path):
     plt.xlabel('Alpha Energy (eV)', fontsize=14)
     plt.ylabel('Cross Section (b)', fontsize=14)
     plt.title('Cross Sections for All Datasets', fontsize=16)
-    plt.legend(fontsize=12)
+    plt.legend(fontsize=10)
 
     plt.xlim(0, 8e6)
     plt.tick_params(axis='both')
@@ -172,12 +172,12 @@ def plot_all_dataframes(directory_path):
     print (label)
     # Сохраняем график
     output_file = os.path.join("all_dataframes_plots/all_in_one_plot.png")
-    plt.savefig(output_file, dpi=300, bbox_inches='tight')
+    plt.savefig(output_file, dpi=1000, bbox_inches='tight')
     print(f"\nГрафик сохранен в файл: {output_file}")
 
-    # plt.close()
     # Показываем график
     plt.show()
+    plt.close()
 
 
 def plot_2_dataframes(directory_path):
