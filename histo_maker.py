@@ -71,6 +71,9 @@ def histo_make(df, n_bins = 50):
 def gauss_histo_plot(fname): 
 
     input_csv = "./full_data_corrected/" + fname + "_corrected.csv" 
+    
+    # input_csv = "tmp.csv"
+    
     df = pd.read_csv(input_csv) 
 
     # Необязательные погрешности 
@@ -104,10 +107,10 @@ def gauss_histo_plot(fname):
 
     df = df.sort_values('E')
 
-    delta_E_desired = 2_000 # eV 
+    delta_E_desired = 10_000 # eV Можно 2_000, чтобы было сравнимо с ширинами резонансов
 
     # Диапазон и бины 
-    E_min, E_max = 300_000, 8_010_000   # eV 
+    E_min, E_max = 0, 8_010_000   # eV 
 
     num_bins = int(np.ceil((E_max - E_min) / delta_E_desired)) or 1 
     bin_edges = np.linspace(E_min, E_max, num_bins + 1) 
@@ -123,6 +126,7 @@ def gauss_histo_plot(fname):
 
     for i, row in df.iterrows():
         if has_dE and row['dE'] > 0:  # Если есть dE и для этой строки >0, используем fractional
+            # usage: norm.cdf(x, mu, sigma)
             fractions = norm.cdf(bin_edges[1:], row['E'], row['dE']) - norm.cdf(bin_edges[:-1], row['E'], row['dE'])
         else:  # Иначе (dE нет или =0) — жесткий биннинг: 1 в бине с E, 0 в остальных
             fractions = np.zeros(num_bins)
@@ -130,38 +134,78 @@ def gauss_histo_plot(fname):
             if 0 <= bin_idx < num_bins:
                 fractions[bin_idx] = 1.0
         
-        mask = fractions > 1e-6 # булиевый массив такой же длинны, что и fractions
+        # ++++!!! Влияет на размер "зоны влияния" вокруг точки в гистограмме !!!++++ #
+        mask = fractions > 1e-6 # булиевый массив такой же длинны, что и fractions # 1e-6
+        # mask = (bin_centers >= row['E'] - row['dE']) & (bin_centers <= row['E'] + row['dE'])    # точка влияет на гистограмму только в пределах усов погрешности
+        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ #
+
         binned_sigma[mask] += row['sigma'] * fractions[mask]    # добавляем вклад текущей точки только в бины, где mask=True 
         binned_d_sigma_sq[mask] += (row['d_sigma'] * fractions[mask]) ** 2  # дисперсия суммы в предположении независимости сл.величин
         weights[mask] += fractions[mask]    # сумма весов в бине от каждой точки 
 
     mask_nonzero = weights > 0 # булиевый массив длинны num_bins 
+    
     binned_sigma[mask_nonzero] /= weights[mask_nonzero] # сечение в бине обратно пропорционально сумме весов в бине 
+    binned_sigma[mask_nonzero] /= delta_E[mask_nonzero]
+    
     binned_d_sigma = np.sqrt(binned_d_sigma_sq) # корень из суммы квадратов погрешностей с учётом весов
+    
     binned_d_sigma[mask_nonzero] /= weights[mask_nonzero]   # делим на вес, чтобы получить среднее. Тк сечение - это усреднённое интегральное значение
+    binned_d_sigma[mask_nonzero] /= delta_E[mask_nonzero]
 
-    # Y = sigma * delta_E 
-    y = binned_sigma * delta_E 
+    # Y = sigma * delta_E  
+    y = binned_sigma * delta_E  # [binned_sigma] = b; [delta_E] = ev
     err_y = binned_d_sigma * delta_E 
     df_histo = pd.DataFrame({'XS_Ea_sum': y, 'dXS_Ea': err_y, 'Ea_mean': bin_centers}) 
     # print(df_histo.head()) 
     df_histo.to_csv('./histo_data/' + fname + '.csv', index=False)
 
     # График 
-    plt.figure(figsize=(10, 6)) 
+    plt.figure(
+        figsize=(10*0.75, 6*0.75)
+        # figsize=(10, 6)
+               ) 
 
     # plt.step(bin_edges, np.concatenate([y[0:1] + err_y[0:1], y + err_y]),        where='pre', color='b', alpha=0.5)
     plt.fill_between(bin_edges, np.concatenate([y[0:1] + err_y[0:1], y + err_y]), step="pre", color='b', alpha=0.5)
-    plt.step(bin_edges, np.concatenate([y[0:1], y]),                             where='pre', color='b', label='sigma * ΔE') 
+    plt.step(bin_edges, np.concatenate([y[0:1], y]),                             where='pre', color='b', 
+            #  label='sigma * ΔE'
+             label=r"$^{13}\text{C}(\alpha, n)^{16}\text{O}$"
+             ) 
     plt.fill_between(bin_edges, np.concatenate([y[0:1] - err_y[0:1], y - err_y]), step="pre", color='w', alpha=0.7)
     plt.step(bin_edges, np.concatenate([y[0:1] - err_y[0:1], y - err_y]),        where='pre', color='b', alpha=0.5) 
     # plt.errorbar(bin_centers[mask_nonzero], y[mask_nonzero], xerr=delta_E[mask_nonzero]/2, yerr=err_y[mask_nonzero], fmt='none', ecolor='r', capsize=3, label='Errors') 
+
+    # plt.errorbar(
+    #     df['E'], 
+    #     df['sigma'], 
+    #     xerr=df['dE'], 
+    #     yerr=df['d_sigma'], 
+    #     #  fmt='.-', 
+    #     fmt='.', 
+    #     capsize=3, 
+    #     elinewidth=1, 
+    #     markersize=4, 
+    #     color='red', 
+    #     #  linewidth=2, 
+    #     label='origin points' + \
+    #         # '\n  E = (' + str(df['E'][0]/1e6)   + '; ' + str(df['E'][1]/1e6)  + ')\n'\
+    #         #   ' dE = (' + str(df['dE'][0]/1e6)  + '; ' + str(df['dE'][1]/1e6) + ')\n'\
+    #         #   ' XS = (' + str(df['sigma'][0])   + '; ' + str(df['sigma'][1])  + ')\n'\
+    #         #   ' dXS= (' + str(df['d_sigma'][0]) + '; ' + str(df['d_sigma'][1])+ ')'  \ 
+    #     '',
+    #     alpha=0.8)
+
     plt.xlabel('E (eV)') 
-    plt.ylabel('sigma * ΔE') 
-    plt.title(f'Ступенчатый график с fractional binning ΔE = {delta_E_desired/1e3} keV') 
+    # plt.ylabel('sigma * ΔE') 
+    plt.ylabel(r'$\langle\sigma\rangle$ (b)')
+    plt.title(f'XS histogram with fractional binning ΔE = {delta_E_desired/1e3} keV' + \
+            #   ', fraction value = 1 standard deviation'
+              '')
     plt.legend() 
     plt.grid(True) 
-    plt.savefig('./histo_plot/' + fname + '.png') 
+
+    plt.savefig('./histo_plot/' + fname + '.png', dpi=1000, bbox_inches='tight')
     # plt.show()
 
 
